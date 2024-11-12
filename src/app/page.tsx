@@ -1,11 +1,12 @@
-'use client'
+'use client';
 import { useEffect, useState } from "react";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
 interface DataItem {
   id: string;
-  [key: string]: any;
+  imageUrls: string[];
+  reviewed: boolean;
 }
 
 export default function Home() {
@@ -13,12 +14,21 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const querySnapshot = await getDocs(collection(db, "your-collection-name"));
-      const items: DataItem[] = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setData(items);
+      try {
+        const querySnapshot = await getDocs(collection(db, "students"));
+        const studentsData = querySnapshot.docs.map((doc) => {
+          const docData = doc.data();
+          return {
+            id: doc.id,
+            imageUrls: docData.imageUrls || [],
+            reviewed: docData.reviewed || false,
+          };
+        });
+
+        setData(studentsData);
+      } catch (error) {
+        console.error("Error fetching data from Firestore:", error);
+      }
     };
 
     fetchData();
@@ -28,9 +38,22 @@ export default function Home() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Firestore Data</h1>
       <ul className="space-y-2">
-        {data.map(item => (
+        {data.map((item) => (
           <li key={item.id} className="p-4 bg-gray-100 rounded-md shadow-sm">
-            {JSON.stringify(item)}
+            <p><strong>ID:</strong> {item.id}</p>
+            <p><strong>Reviewed:</strong> {item.reviewed ? "Yes" : "No"}</p>
+            <div className="mt-2">
+              <strong>Image URLs:</strong>
+              <ul className="list-disc ml-4">
+                {item.imageUrls.map((url, index) => (
+                  <li key={index}>
+                    <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                      {url}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </li>
         ))}
       </ul>
