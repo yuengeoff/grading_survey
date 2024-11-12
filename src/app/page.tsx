@@ -31,7 +31,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface Student {
   id: string;
-  imageUrls: string[];
+  images: { url: string; grade: number }[];
   reviewed: boolean;
 }
 
@@ -58,7 +58,7 @@ export default function ReviewImages() {
             const studentData = studentSnapshot.data() as Student;
             setStudent({
               id: studentSnapshot.id,
-              imageUrls: studentData.imageUrls,
+              images: studentData.images,
               reviewed: studentData.reviewed,
             });
 
@@ -101,13 +101,13 @@ export default function ReviewImages() {
 
   const handleResponse = (response: boolean) => {
     if (student) {
-      const currentUrl = student.imageUrls[currentImageIndex];
+      const currentUrl = student.images[currentImageIndex].url;
       setResponses((prev) => ({
         ...prev,
         [currentUrl]: response,
       }));
 
-      if (currentImageIndex < student.imageUrls.length - 1) {
+      if (currentImageIndex < student.images.length - 1) {
         setCurrentImageIndex(currentImageIndex + 1);
       } else {
         handleSubmit();
@@ -137,7 +137,7 @@ export default function ReviewImages() {
   };
 
   const progress = student
-    ? ((currentImageIndex + 1) / student.imageUrls.length) * 100
+    ? ((currentImageIndex + 1) / student.images.length) * 100
     : 0;
 
   return (
@@ -153,15 +153,14 @@ export default function ReviewImages() {
             <div>
               <Progress value={progress} className="w-full" />
               <p className="text-sm text-muted-foreground mt-2">
-                {currentImageIndex + 1}/{student.imageUrls.length} images
-                reviewed
+                {currentImageIndex + 1}/{student.images.length} images reviewed
               </p>
             </div>
 
             <div className="aspect-video relative rounded-lg overflow-hidden">
-              {student && student.imageUrls[currentImageIndex] ? (
+              {student && student.images[currentImageIndex] ? (
                 <Image
-                  src={student.imageUrls[currentImageIndex]}
+                  src={student.images[currentImageIndex].url}
                   alt={`Image ${currentImageIndex + 1}`}
                   layout="fill"
                   objectFit="cover"
@@ -172,7 +171,9 @@ export default function ReviewImages() {
             </div>
 
             <div className="text-center">
-              <p className="text-lg font-semibold">Suggested Grade: 3</p>
+              <p className="text-lg font-semibold">
+                Suggested Grade: {student.images[currentImageIndex].grade}
+              </p>
               <p className="text-sm text-muted-foreground">
                 Do you agree with this grade?
               </p>
