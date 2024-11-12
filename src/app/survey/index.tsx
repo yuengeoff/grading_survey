@@ -1,6 +1,6 @@
 // pages/index.tsx
 import { useEffect, useState } from "react";
-import { db } from "../../lib/firebase";
+import { db } from "../../../lib/firebase"
 import { collection, getDocs } from "firebase/firestore";
 
 interface DataItem {
@@ -13,7 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const querySnapshot = await getDocs(collection(db, "your-collection-name"));
+      const querySnapshot = await getDocs(collection(db, "students"));
       const items: DataItem[] = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
