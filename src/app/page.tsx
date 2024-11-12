@@ -1,4 +1,4 @@
-// pages/index.tsx
+'use client'
 import { useEffect, useState } from "react";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
